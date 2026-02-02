@@ -1,0 +1,512 @@
+/* =========================================
+   1. CSS Variables & Theme Configuration
+   ========================================= */
+:root {
+  /* Cyber/Industrial Palette */
+  --bg-dark: #0a0e17;
+  /* Deepest blue-black */
+  --bg-panel: #111625;
+  /* Slightly lighter panel bg */
+  --primary-neon: #00f3ff;
+  /* Cyan Neon */
+  --secondary-neon: #7000ff;
+  /* Purple Neon */
+  --alert-critical: #ff2a2a;
+  /* Bright Red */
+  --alert-warning: #ffae00;
+  /* Amber */
+  --success: #00ff9d;
+  /* Matrix Green */
+  --text-primary: #e0e6ed;
+  --text-secondary: #94a3b8;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(17, 22, 37, 0.75);
+  --glass-border: rgba(0, 243, 255, 0.1);
+  --glass-blur: 12px;
+
+  /* Spacing & Layout */
+  --sidebar-width: 240px;
+  --header-height: 70px;
+  --gap: 20px;
+
+  /* Fonts */
+  --font-main: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Theme Specific */
+  --theme-accent: #ccff00;
+  /* Default Lime for Dark Mode */
+}
+
+/* Light Theme Overrides - Cyber Industrial Light */
+.light-theme {
+  /* Backgrounds: Cool, high-tech light grey */
+  --bg-dark: #eef2f6;
+
+  /* Panels: Frosted white with tech feel */
+  --bg-panel: rgba(255, 255, 255, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+
+  /* Borders: Subtle Cyan hint to match dark mode DNA */
+  --glass-border: rgba(0, 150, 255, 0.15);
+
+  /* Accents: Darker versions of the Neon colors for contrast */
+  --primary-neon: #0077b6;
+  /* Deep Cyber Blue/Cyan */
+  --secondary-neon: #6200ea;
+  /* Deep Purple */
+  --theme-accent: #0077b6;
+
+  /* Text: Tech Slate */
+  --text-primary: #111827;
+  /* Near black */
+  --text-secondary: #4b5563;
+  /* Cool greyish */
+
+  /* Status Colors */
+  --alert-critical: #ef4444;
+  --alert-warning: #f59e0b;
+  --success: #10b981;
+
+  /* Shadows: Soft blue-tinted shadows */
+  --panel-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+}
+
+.light-theme .glass-panel {
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Sidebar: keeps glass effect but light */
+.light-theme .sidebar {
+  background: rgba(255, 255, 255, 0.85);
+  border-right: 1px solid var(--glass-border);
+}
+
+.light-theme .nav-item.active {
+  background: rgba(0, 119, 182, 0.1);
+  color: var(--primary-neon);
+  box-shadow: 0 0 15px rgba(0, 119, 182, 0.15);
+  /* Soft glow */
+}
+
+.light-theme .nav-item:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* Interactive Elements */
+.light-theme .notification-btn:hover {
+  background: rgba(0, 119, 182, 0.1) !important;
+  border-color: var(--primary-neon);
+  box-shadow: 0 0 15px rgba(0, 119, 182, 0.2);
+}
+
+/* Subtle grid background for light mode too */
+.light-theme body {
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(98, 0, 234, 0.03), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(0, 119, 182, 0.05), transparent 25%);
+}
+
+/* =========================================
+   2. Global Reset & Base Styles
+   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  overflow: hidden;
+  /* App handles scrolling */
+  height: 100vh;
+  width: 100vw;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(0, 243, 255, 0.08), transparent 25%);
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3748;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-neon);
+}
+
+/* =========================================
+   3. Utility Classes
+   ========================================= */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(0, 243, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Notification Button */
+.notification-btn {
+  transition: all 0.3s ease;
+}
+
+.notification-btn:hover {
+  background: rgba(0, 255, 255, 0.1) !important;
+  border-color: var(--primary-neon);
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--alert-critical);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-primary);
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(255, 50, 50, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(255, 50, 50, 0.8);
+  }
+}
+
+
+.text-neon {
+  color: var(--primary-neon);
+  text-shadow: 0 0 5px rgba(0, 243, 255, 0.6);
+}
+
+.text-critical {
+  color: var(--alert-critical);
+  text-shadow: 0 0 5px rgba(255, 42, 42, 0.6);
+}
+
+/* =========================================
+   4. Layout Structure (Grid)
+   ========================================= */
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  /* 2/3 for Digital Twin, 1/3 for Stats/Alerts */
+  grid-template-rows: auto 1fr;
+  gap: var(--gap);
+  padding: var(--gap);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Columns */
+.col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  height: 100%;
+}
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  height: 100%;
+}
+
+/* =========================================
+   5. Component Specific Styles
+   ========================================= */
+
+/* --- Sidebar --- */
+.sidebar {
+  width: var(--sidebar-width);
+  background: rgba(10, 14, 23, 0.95);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-item {
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  background: rgba(0, 243, 255, 0.08);
+  color: var(--primary-neon);
+}
+
+/* --- Digital Twin Stage --- */
+.digital-twin-stage {
+  flex: 1;
+  /* Takes remaining height in left col */
+  min-height: 400px;
+  max-height: 500px;
+  /* Fixed maximum height */
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-overlay {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background-image:
+    linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+  animation: grid-move 20s linear infinite;
+}
+
+/* --- Stat Cards --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap);
+}
+
+.stat-card {
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.stat-unit {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-left: 4px;
+}
+
+/* --- Alert Panel --- */
+.alert-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.alert-item {
+  background: rgba(255, 42, 42, 0.1);
+  border-left: 3px solid var(--alert-critical);
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-item.warning {
+  background: rgba(255, 174, 0, 0.1);
+  border-color: var(--alert-warning);
+}
+
+.alert-msg {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.alert-time {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  display: block;
+}
+
+/* --- Animations --- */
+@keyframes grid-move {
+  0% {
+    transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px);
+  }
+
+  100% {
+    transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px);
+  }
+}
+
+@keyframes pulse-critical {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 42, 42, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 42, 42, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 42, 42, 0);
+  }
+}
+
+.pulse-red {
+  animation: pulse-critical 2s infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 15px;
+  }
+
+  .sidebar .logo {
+    margin-bottom: 0;
+    margin-right: 30px;
+  }
+}
+
+/* Notification & Dropdown Animations */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+.notification-btn:active {
+  transform: scale(0.95);
+}
+
+.alert-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(4px);
+  transition: all 0.2s ease;
+}

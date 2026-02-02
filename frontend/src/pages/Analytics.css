@@ -1,0 +1,224 @@
+/* Analytics Page Styles */
+.analytics-page {
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    padding: 0;
+    font-family: var(--font-main, sans-serif);
+    /* Override parent grid */
+    grid-column: 1 / -1;
+    /* Negative margin to counteract parent padding */
+    margin: calc(-1 * var(--gap, 20px));
+    width: calc(100% + 2 * var(--gap, 20px));
+}
+
+/* Header */
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 24px 24px 24px 24px;
+}
+
+.analytics-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.05em;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.version-tag {
+    color: var(--text-secondary);
+    /* gray-600 */
+    font-size: 1.125rem;
+    font-weight: 400;
+}
+
+.analytics-subtitle {
+    color: var(--text-secondary);
+    /* gray-500 */
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+.text-neon {
+    color: var(--theme-accent);
+    /* Neon Lime / Cherry Red */
+}
+
+/* ... skipped ... */
+
+/* Header Actions */
+.live-badge {
+    padding: 4px 12px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ... skipped ... */
+
+/* Stat Card */
+.analytics-stat-card {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.analytics-stat-card:hover {
+    border-color: var(--theme-accent);
+}
+
+.stat-icon-bg {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 12px;
+    opacity: 0.15;
+    transition: opacity 0.3s;
+    color: var(--theme-accent);
+}
+
+.analytics-stat-card:hover .stat-icon-bg {
+    opacity: 0.25;
+}
+
+/* ... skipped ... */
+
+.stat-label {
+    color: var(--text-secondary);
+    /* ... */
+}
+
+.stat-icon-main {
+    color: var(--theme-accent);
+    /* ... */
+}
+
+.stat-body {
+    /* ... */
+    color: var(--theme-accent);
+}
+
+.stat-value {
+    /* ... */
+    text-shadow: none;
+    /* Removed hard text shadow for cleaner light look, or var */
+}
+
+.stat-unit {
+    color: var(--text-secondary);
+}
+
+/* ... skipped ... */
+
+/* Logs Panel */
+.analytics-logs {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 16px;
+    flex: 1;
+    /* Takes up remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.logs-title {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+.logs-subtitle {
+    font-size: 0.625rem;
+    color: #4b5563;
+}
+
+.logs-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: monospace;
+    font-size: 0.75rem;
+}
+
+.log-entry {
+    display: flex;
+    gap: 16px;
+    padding: 4px 12px;
+    border-left-width: 2px;
+    border-left-style: solid;
+}
+
+.log-info {
+    border-left-color: #ccff00;
+    background-color: rgba(204, 255, 0, 0.05);
+    color: #9ca3af;
+}
+
+.log-normal {
+    border-left-color: #374151;
+    /* gray-700 */
+    color: #9ca3af;
+}
+
+.log-error {
+    border-left-color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.05);
+    color: #9ca3af;
+}
+
+.log-time {
+    opacity: 0.5;
+}
+
+.log-text {
+    color: var(--text-primary);
+}
+
+.log-text-error {
+    color: #f87171;
+    /* red-400 */
+}
+
+/* Animations */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
