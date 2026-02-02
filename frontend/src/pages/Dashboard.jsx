@@ -115,8 +115,12 @@ const Dashboard = ({ theme, toggleTheme }) => {
                             </div>
                         )}
                     </div>
-                    <div className="glass-panel flex-center" style={{ width: '40px', height: '40px', borderRadius: '50%' }}>
-                        <User size={20} color="var(--primary-neon)" />
+                    <div className="glass-panel flex-center" style={{ padding: '0 15px', height: '40px', borderRadius: '20px', gap: '10px' }}>
+                        <User size={18} color="var(--primary-neon)" />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{user?.name || 'User'}</span>
+                        <span style={{ fontSize: '0.7rem', opacity: 0.6, background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                            {user?.role?.toUpperCase()}
+                        </span>
                     </div>
                 </div>
             </header>
@@ -194,15 +198,17 @@ const Dashboard = ({ theme, toggleTheme }) => {
                     />
                 </div>
 
-                {/* Maintenance Scheduler - RESTRICTED FOR VIEWERS */}
-                {!isViewer ? (
+                {/* Maintenance Scheduler - RESTRICTED FOR VIEWERS & ADMIN (Admin focuses on management) */}
+                {(user?.role === 'technician') ? (
                     <MaintenanceScheduler tasks={maintenanceTasks} onOptimize={optimizeTasks} />
                 ) : (
                     <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', alignItems: 'center', textAlign: 'center', opacity: 0.7 }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🔒</div>
-                        <h3 style={{ color: 'var(--text-secondary)' }}>RESTRICTED ACCESS</h3>
+                        <div style={{ fontSize: '3rem', marginBottom: '10px' }}>{isViewer ? '🔒' : '⚙️'}</div>
+                        <h3 style={{ color: 'var(--text-secondary)' }}>{isViewer ? 'RESTRICTED ACCESS' : 'MANAGEMENT MODE'}</h3>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '5px' }}>
-                            Detailed maintenance schedules are available to Technicians only.
+                            {isViewer
+                                ? 'Detailed maintenance schedules are available to Technicians only.'
+                                : 'Admin focus is restricted to User Management and High-level Monitoring.'}
                         </p>
                     </div>
                 )}

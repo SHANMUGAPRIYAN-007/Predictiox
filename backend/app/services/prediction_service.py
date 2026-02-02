@@ -8,8 +8,8 @@ from typing import Optional, Dict, Any, List
 from influxdb_client import Point
 from influxdb_client.client.exceptions import InfluxDBError
 
-from app.core.influx import InfluxDBManager
-from app.models.schemas import SensorDataRequest
+from ..core.influx import InfluxDBManager
+from ..models.schemas import SensorDataRequest
 
 
 class PredictionService:

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Settings from './pages/Settings';
 import VoiceAssistant from './components/VoiceAssistant';
 import { useMockData } from './hooks/useMockData';
 import { useAuth } from './context/AuthContext';
@@ -25,7 +26,17 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/register" replace />;
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const RoleRoute = ({ children, allowedRoles }) => {
+  const { user } = useAuth();
+
+  if (!allowedRoles.includes(user?.role)) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -64,9 +75,20 @@ const App = () => {
               <Dashboard theme={theme} toggleTheme={toggleTheme} />
             </ProtectedRoute>
           } />
+
           <Route path="/analytics" element={
             <ProtectedRoute>
-              <Analytics theme={theme} />
+              <RoleRoute allowedRoles={['admin', 'technician']}>
+                <Analytics theme={theme} />
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={['technician']}>
+                <Settings />
+              </RoleRoute>
             </ProtectedRoute>
           } />
         </Routes>

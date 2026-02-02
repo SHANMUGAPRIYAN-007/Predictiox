@@ -1,12 +1,12 @@
 # PredictionX Backend
 
-Production-ready Python FastAPI backend for sensor data ingestion and querying with InfluxDB 2.x.
+Production-ready Python Flask backend for sensor data ingestion and querying with InfluxDB 2.x.
 
 ## Architecture
 
 ```
-Sensors → Python FastAPI Backend → InfluxDB
-React Frontend → Python FastAPI Backend → InfluxDB
+Sensors → Python Flask Backend → InfluxDB
+React Frontend → Python Flask Backend → InfluxDB
 ```
 
 **Key Design Principles:**
@@ -20,16 +20,19 @@ React Frontend → Python FastAPI Backend → InfluxDB
 ```
 backend/
 ├── app/
-│   ├── main.py                 # FastAPI app, CORS, routers
+│   ├── __init__.py            # Flask Application Factory
+│   ├── config.py              # Configuration loading
 │   ├── core/
 │   │   └── influx.py          # InfluxDB client manager
 │   ├── api/
-│   │   ├── ingest.py          # Sensor ingestion endpoint
-│   │   └── read.py            # Frontend query endpoint
+│   │   ├── ingest.py          # Sensor ingestion Blueprint
+│   │   ├── read.py            # Frontend query Blueprint
+│   │   └── logs.py            # System logs Blueprint
 │   ├── models/
-│   │   └── schemas.py         # Pydantic request/response models
+│   │   └── schemas.py         # Pydantic (V2) request/response models
 │   └── services/
 │       └── prediction_service.py  # Business logic
+├── run.py                     # Entry point (from backend root)
 ├── requirements.txt
 ├── .env.example
 └── README.md
@@ -79,13 +82,11 @@ INFLUX_BUCKET=predictionx
 
 ```bash
 # Development mode (with auto-reload)
-ENV=development python -m app.main
+python run.py
 
 # Production mode
-python -m app.main
-
-# Or using uvicorn directly
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Gunicorn is recommended for production (pip install gunicorn)
+# gunicorn -w 4 -b 0.0.0.0:8000 "app:create_app('production')"
 ```
 
 The API will be available at `http://localhost:8000`
@@ -141,38 +142,6 @@ GET /api/latest/{sensor_id}
 }
 ```
 
-**Response (not found):**
-```json
-{
-  "sensorId": "sensor_999",
-  "zone": null,
-  "value": null,
-  "latencyMs": null,
-  "timestamp": null,
-  "found": false
-}
-```
-
-## InfluxDB Data Model
-
-**Measurement:** `sensor_predictions`
-
-**Tags:**
-- `sensor_id` - Unique sensor identifier
-- `zone` - Sensor zone/location
-
-**Fields:**
-- `value` - Sensor reading value (float)
-- `latency_ms` - Latency in milliseconds (float)
-
-**Timestamp:** Server time (UTC)
-
-## Interactive API Documentation
-
-Once running, visit:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
-
 ## Testing with curl
 
 ### Ingest sensor data:
@@ -191,39 +160,3 @@ curl -X POST http://localhost:8000/api/ingest \
 ```bash
 curl http://localhost:8000/api/latest/sensor_001
 ```
-
-## Security Notes
-
-- InfluxDB credentials are only in `.env` (never committed)
-- Sensors only need the backend URL, not InfluxDB access
-- Frontend only needs the backend URL, not InfluxDB access
-- All database operations go through the service layer
-- CORS is configured for your React frontend origin
-
-## Production Deployment
-
-1. Set `ENV=production` in `.env`
-2. Use a production ASGI server (uvicorn with workers)
-3. Set proper CORS origins for your frontend domain
-4. Use HTTPS in production
-5. Secure your `.env` file with proper permissions
-6. Consider using environment variables from your hosting platform
-
-Example production command:
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
-```
-
-## Troubleshooting
-
-**Connection Error:**
-- Verify InfluxDB is running
-- Check `INFLUX_URL` is correct
-- Verify `INFLUX_TOKEN` has write/read permissions
-
-**CORS Error:**
-- Add your frontend URL to `CORS_ORIGINS` in `.env`
-
-**Import Errors:**
-- Ensure virtual environment is activated
-- Run `pip install -r requirements.txt`

@@ -2,64 +2,44 @@
 HTTP layer for sensor data ingestion.
 Handles POST /api/ingest endpoint.
 """
-from fastapi import APIRouter, HTTPException, status
+from flask import Blueprint, request, jsonify
 from influxdb_client.client.exceptions import InfluxDBError
+from pydantic import ValidationError
 
-from app.models.schemas import SensorDataRequest, SensorDataResponse, ErrorResponse
-from app.services.prediction_service import PredictionService
+from ..models.schemas import SensorDataRequest
+from ..services.prediction_service import PredictionService
 
+ingest_bp = Blueprint('ingest', __name__, url_prefix='/api')
 
-router = APIRouter(prefix="/api", tags=["Ingestion"])
-
-
-@router.post(
-    "/ingest",
-    response_model=SensorDataResponse,
-    status_code=status.HTTP_201_CREATED,
-    responses={
-        400: {"model": ErrorResponse, "description": "Validation error"},
-        500: {"model": ErrorResponse, "description": "Internal server error"}
-    },
-    summary="Ingest sensor data",
-    description="Receives sensor data from physical sensors and writes to InfluxDB"
-)
-async def ingest_sensor_data(data: SensorDataRequest):
+@ingest_bp.route('/ingest', methods=['POST'])
+def ingest_sensor_data():
     """
     Ingest sensor data endpoint.
-    
-    Validates incoming sensor data and writes it to InfluxDB.
-    Sensors should POST to this endpoint with their readings.
-    
-    Args:
-        data: Sensor data payload
-        
-    Returns:
-        Success response with timestamp
-        
-    Raises:
-        HTTPException: On validation or database errors
+    Retrieves sensor data from physical sensors and writes to InfluxDB.
     """
     try:
+        # Validate request data using Pydantic
+        json_data = request.get_json()
+        if not json_data:
+            return jsonify({"success": False, "error": "No input data provided"}), 400
+            
+        data = SensorDataRequest(**json_data)
+        
         service = PredictionService()
         timestamp = service.write_sensor_data(data)
         
-        return SensorDataResponse(
-            sensorId=data.sensorId,
-            timestamp=timestamp
-        )
+        return jsonify({
+            "success": True,
+            "message": "Data ingested successfully",
+            "sensorId": data.sensorId,
+            "timestamp": timestamp
+        }), 201
         
+    except ValidationError as e:
+        return jsonify({"success": False, "error": "Validation error", "detail": str(e)}), 400
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        return jsonify({"success": False, "error": "Value error", "detail": str(e)}), 400
     except InfluxDBError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
+        return jsonify({"success": False, "error": "Database error", "detail": str(e)}), 500
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}"
-        )
+        return jsonify({"success": False, "error": "Unexpected error", "detail": str(e)}), 500

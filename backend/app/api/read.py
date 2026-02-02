@@ -2,111 +2,74 @@
 HTTP layer for frontend data queries.
 Handles GET /api/latest/{sensor_id} endpoint.
 """
-from fastapi import APIRouter, HTTPException, status, Path
+from flask import Blueprint, jsonify, request
 from influxdb_client.client.exceptions import InfluxDBError
+import random
 
-from app.models.schemas import LatestSensorDataResponse, ErrorResponse
-from app.services.prediction_service import PredictionService
+from ..services.prediction_service import PredictionService
 
+read_bp = Blueprint('read', __name__, url_prefix='/api')
 
-router = APIRouter(prefix="/api", tags=["Read"])
-
-
-@router.get(
-    "/latest/{sensor_id}",
-    response_model=LatestSensorDataResponse,
-    status_code=status.HTTP_200_OK,
-    responses={
-        404: {"model": ErrorResponse, "description": "Sensor data not found"},
-        500: {"model": ErrorResponse, "description": "Internal server error"}
-    },
-    summary="Get latest sensor data",
-    description="Retrieves the most recent data point for a specific sensor from InfluxDB"
-)
-async def get_latest_sensor_data(
-    sensor_id: str = Path(..., description="Unique sensor identifier", min_length=1)
-):
+@read_bp.route('/latest/<sensor_id>', methods=['GET'])
+def get_latest_sensor_data(sensor_id):
     """
     Get latest sensor data endpoint.
-    
     Queries InfluxDB for the most recent data point for the specified sensor.
-    Used by the React frontend to display current sensor readings.
-    
-    Args:
-        sensor_id: Sensor identifier to query
-        
-    Returns:
-        Latest sensor data or not found response
-        
-    Raises:
-        HTTPException: On database errors
     """
     try:
         service = PredictionService()
         data = service.get_latest_sensor_data(sensor_id)
         
         if data is None:
-            return LatestSensorDataResponse(
-                sensorId=sensor_id,
-                found=False
-            )
+            return jsonify({
+                "sensorId": sensor_id,
+                "found": False
+            }), 404
         
-        return LatestSensorDataResponse(
-            sensorId=data["sensor_id"],
-            zone=data["zone"],
-            value=data["value"],
-            latencyMs=data["latency_ms"],
-            timestamp=data["timestamp"],
-            found=True
-        )
+        return jsonify({
+            "sensorId": data["sensor_id"],
+            "zone": data["zone"],
+            "value": data["value"],
+            "latencyMs": data["latency_ms"],
+            "timestamp": data["timestamp"],
+            "found": True
+        }), 200
         
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        return jsonify({"success": False, "error": str(e)}), 400
     except InfluxDBError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
+        return jsonify({"success": False, "error": f"Database error: {str(e)}"}), 500
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}"
-        )
+        return jsonify({"success": False, "error": f"Unexpected error: {str(e)}"}), 500
 
 
-@router.get("/history/{sensor_id}")
-async def get_sensor_history(
-    sensor_id: str = Path(..., min_length=1),
-    minutes: int = 60
-):
+@read_bp.route('/history/<sensor_id>', methods=['GET'])
+def get_sensor_history(sensor_id):
     """Get historical data for a sensor."""
     try:
+        minutes = request.args.get('minutes', default=60, type=int)
         service = PredictionService()
-        return service.get_sensor_history(sensor_id, minutes)
-    except Exception as e:
+        history = service.get_sensor_history(sensor_id, minutes)
+        return jsonify(history), 200
+    except Exception:
         # Fallback for demo if Influx is empty/down
-        return []
+        return jsonify([]), 200
 
-@router.get("/rul/{machine_id}")
-async def get_rul_prediction(machine_id: str):
+@read_bp.route('/rul/<machine_id>', methods=['GET'])
+def get_rul_prediction(machine_id):
     """Get RUL prediction (Mock logic moved to backend)."""
     # In a real ML backend, this would call the model
-    import random
-    return {
+    return jsonify({
         "machine_id": machine_id,
         "rul_percentage": random.randint(70, 95), # Mock value
         "status": "Healthy"
-    }
+    }), 200
 
-@router.get("/power")
-async def get_power_stats():
+@read_bp.route('/power', methods=['GET'])
+def get_power_stats():
     """Get Power statistics (Mock logic)."""
-    import random
-    return {
+    return jsonify({
         "efficiency": random.randint(85, 98),
         "power_usage": random.randint(200, 450),
         "eco_mode": False
-    }
+    }), 200

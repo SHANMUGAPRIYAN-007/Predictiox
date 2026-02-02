@@ -2,20 +2,11 @@
 HTTP layer for system logs.
 Handles GET /api/logs endpoint.
 """
-from typing import List
-from datetime import datetime
-from fastapi import APIRouter, status
-from pydantic import BaseModel
+from flask import Blueprint, jsonify
 
-router = APIRouter(prefix="/api", tags=["Logs"])
+logs_bp = Blueprint('logs', __name__, url_prefix='/api')
 
-class SystemLog(BaseModel):
-    time: str
-    message: str
-    type: str
-
-# In-memory storage for demo purposes (would be InfluxDB/Postgres in full prod)
-# Pre-populating with the sample data to match the UI
+# In-memory storage for demo purposes
 MOCK_LOGS = [
     {"time": "5:51:23 PM", "message": "Anomaly Detected: Abnormal Vibration Pattern", "type": "anomaly"},
     {"time": "5:59:45 PM", "message": "Abnormal Vibration (Unbalance)", "type": "critical"},
@@ -26,16 +17,10 @@ MOCK_LOGS = [
     {"time": "6:05:15 PM", "message": "Anomaly Detected: Temperature Spike", "type": "anomaly"},
 ]
 
-@router.get(
-    "/logs",
-    response_model=List[SystemLog],
-    status_code=status.HTTP_200_OK,
-    summary="Get system logs",
-    description="Retrieves recent system logs and anomalies"
-)
-async def get_system_logs():
+@logs_bp.route('/logs', methods=['GET'])
+def get_system_logs():
     """
     Get all system logs.
     Currently returns mock data for demonstration.
     """
-    return MOCK_LOGS
+    return jsonify(MOCK_LOGS), 200

@@ -1,7 +1,7 @@
 """
 Pydantic models for request/response validation.
 """
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
 
@@ -14,15 +14,16 @@ class SensorDataRequest(BaseModel):
     value: float = Field(..., description="Sensor reading value")
     latencyMs: float = Field(..., ge=0, description="Latency in milliseconds")
     
-    @validator('sensorId', 'zone')
-    def validate_not_empty(cls, v):
+    @field_validator('sensorId', 'zone')
+    @classmethod
+    def validate_not_empty(cls, v: str) -> str:
         """Ensure string fields are not empty after stripping."""
         if not v.strip():
             raise ValueError("Field cannot be empty or whitespace")
         return v.strip()
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "sensorId": "sensor_001",
                 "zone": "zone_A",
@@ -41,7 +42,7 @@ class SensorDataResponse(BaseModel):
     timestamp: datetime
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "success": True,
                 "message": "Data ingested successfully",
@@ -62,7 +63,7 @@ class LatestSensorDataResponse(BaseModel):
     found: bool
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "sensorId": "sensor_001",
                 "zone": "zone_A",
@@ -82,7 +83,7 @@ class ErrorResponse(BaseModel):
     detail: Optional[str] = None
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "success": False,
                 "error": "Validation error",

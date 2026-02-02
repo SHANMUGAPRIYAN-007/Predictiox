@@ -4,17 +4,17 @@ import { useAuth } from '../context/AuthContext';
 import { Zap, User, Lock, UserCog, Eye, EyeOff, Sun, Moon } from 'lucide-react';
 
 const Register = ({ theme, toggleTheme }) => {
+    const { register, user: currentUser, userCount } = useAuth();
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         username: '',
         password: '',
         confirmPassword: '',
-        role: 'viewer'
+        role: userCount === 0 ? 'admin' : (currentUser?.role === 'admin' ? 'technician' : 'viewer')
     });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-
-    const { register } = useAuth();
-    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -34,11 +34,17 @@ const Register = ({ theme, toggleTheme }) => {
             return;
         }
 
-        const success = register(formData.username, formData.password, formData.role);
-        if (success) {
-            navigate('/login');
+        const result = register(formData.username, formData.password, formData.role, currentUser);
+        if (result.success) {
+            // If admin created a tech, don't navigate away, just clear form or show success
+            if (currentUser?.role === 'admin') {
+                alert(`Successfully registered ${formData.role}: ${formData.username}`);
+                setFormData({ username: '', password: '', confirmPassword: '', role: 'viewer' });
+            } else {
+                navigate('/login');
+            }
         } else {
-            setError("Username already exists");
+            setError(result.error);
         }
     };
 
@@ -122,13 +128,35 @@ const Register = ({ theme, toggleTheme }) => {
                                 width: '100%', padding: '12px 12px 12px 40px',
                                 background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)',
                                 borderRadius: '8px', color: 'var(--text-primary)', outline: 'none',
-                                cursor: 'pointer'
+                                cursor: (currentUser?.role === 'admin' || userCount === 0) ? 'pointer' : 'not-allowed'
                             }}
+                            disabled={currentUser?.role !== 'admin' && userCount > 0}
                         >
-                            <option value="viewer">Viewer (Read Only)</option>
-                            <option value="technician">Technician (Full Access)</option>
+                            <option value="admin">Administrator (Full System Access)</option>
+                            <option value="technician">Technician (Maintenance & Settings)</option>
+                            <option value="viewer">Viewer (Read-Only Terminal)</option>
                         </select>
                     </div>
+
+                    {userCount === 0 ? (
+                        <div style={{
+                            padding: '10px', background: 'rgba(0, 243, 255, 0.1)',
+                            borderRadius: '8px', border: '1px solid var(--primary-neon)',
+                            textAlign: 'center', marginBottom: '10px'
+                        }}>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--primary-neon)', fontWeight: 'bold' }}>
+                                ⚡ FIRST INITIALIZATION DETECTED
+                            </p>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                You are the first user. You will be established as the System Administrator.
+                            </p>
+                        </div>
+                    ) : currentUser?.role !== 'admin' && (
+                        <p style={{ fontSize: '0.75rem', color: 'var(--alert-critical)', marginTop: '-10px', textAlign: 'center' }}>
+                            * Public registration restricted to Viewer role.
+                            <br />Admin credentials required for technical roles.
+                        </p>
+                    )}
 
                     {/* Password */}
                     <div style={{ position: 'relative' }}>

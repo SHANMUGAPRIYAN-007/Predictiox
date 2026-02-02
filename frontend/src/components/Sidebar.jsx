@@ -29,18 +29,38 @@ const Sidebar = () => {
                     <span>Dashboard</span>
                 </NavLink>
 
-                <NavLink
-                    to="/analytics"
-                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                >
-                    <Activity size={20} />
-                    <span>Analytics</span>
-                </NavLink>
+                {/* Technical staff access */}
+                {(user?.role === 'admin' || user?.role === 'technician') && (
+                    <NavLink
+                        to="/analytics"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                    >
+                        <Activity size={20} />
+                        <span>Analytics</span>
+                    </NavLink>
+                )}
 
-                <div className="nav-item">
-                    <Settings size={20} />
-                    <span>Settings</span>
-                </div>
+                {/* Admin-only User Management */}
+                {user?.role === 'admin' && (
+                    <NavLink
+                        to="/register"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                    >
+                        <User size={20} />
+                        <span>User Management</span>
+                    </NavLink>
+                )}
+
+                {/* Technician access to Settings */}
+                {user?.role === 'technician' && (
+                    <NavLink
+                        to="/settings"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
+                    </NavLink>
+                )}
             </nav>
 
             {/* User Profile & Logout Section */}

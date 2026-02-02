@@ -6,14 +6,16 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const [userCount, setUserCount] = useState(0);
+
     useEffect(() => {
         // Initialize Mock DB if empty
-        if (!localStorage.getItem('predictiox_db_users')) {
-            const defaultUsers = [
-                { username: 'tech', password: 'tech123', role: 'technician', name: 'Max Tech' },
-                { username: 'view', password: 'view123', role: 'viewer', name: 'Alex Viewer' }
-            ];
-            localStorage.setItem('predictiox_db_users', JSON.stringify(defaultUsers));
+        const storedUsers = localStorage.getItem('predictiox_db_users');
+        if (!storedUsers) {
+            localStorage.setItem('predictiox_db_users', JSON.stringify([]));
+            setUserCount(0);
+        } else {
+            setUserCount(JSON.parse(storedUsers).length);
         }
 
         // Check active session
@@ -29,7 +31,12 @@ export const AuthProvider = ({ children }) => {
         const found = users.find(u => u.username === username && u.password === password);
 
         if (found) {
-            const userData = { username: found.username, role: found.role, name: found.name };
+            const userData = {
+                username: found.username,
+                role: found.role,
+                name: found.name,
+                id: found.username
+            };
             setUser(userData);
             localStorage.setItem('predictiox_user', JSON.stringify(userData));
             return true;
@@ -37,23 +44,36 @@ export const AuthProvider = ({ children }) => {
         return false;
     };
 
-    const register = (username, password, role) => {
+    const register = (username, password, role, invitedBy = null) => {
         const users = JSON.parse(localStorage.getItem('predictiox_db_users') || '[]');
 
         if (users.find(u => u.username === username)) {
-            return false;
+            return { success: false, error: 'User already exists' };
         }
+
+        // Logical Fix: If NO users exist, allow the first registrant to be an Admin
+        const isFirstUser = users.length === 0;
+
+        // Business Logic: Only Admin can create Technicians or other Admins (unless it's the first user)
+        if (!isFirstUser && (role === 'technician' || role === 'admin') && (!invitedBy || invitedBy.role !== 'admin')) {
+            return { success: false, error: 'Unauthorized: Only Admins can register technical staff' };
+        }
+
+        // Safe-guard: If it's the first user, FORCE them to be an admin to avoid locking the system
+        const effectiveRole = isFirstUser ? 'admin' : role;
 
         const newUser = {
             username,
             password,
-            role,
-            name: username.charAt(0).toUpperCase() + username.slice(1)
+            role: effectiveRole,
+            name: username.charAt(0).toUpperCase() + username.slice(1),
+            createdAt: new Date().toISOString()
         };
 
         users.push(newUser);
         localStorage.setItem('predictiox_db_users', JSON.stringify(users));
-        return true;
+        setUserCount(users.length);
+        return { success: true };
     };
 
     const logout = () => {
@@ -62,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, userCount }}>
             {!loading && children}
         </AuthContext.Provider>
     );
