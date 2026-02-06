@@ -8,6 +8,8 @@ import RULGauge from '../components/RULGauge';
 import PowerOptimizer from '../components/PowerOptimizer';
 import MaintenanceScheduler from '../components/MaintenanceScheduler';
 import SpeedometerGauge from '../components/SpeedometerGauge';
+import MyAssignedMachines from '../components/MyAssignedMachines';
+import AdminMachineManager from '../components/AdminMachineManager';
 import { useMockData } from '../hooks/useMockData';
 import { User, Bell, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -199,16 +201,25 @@ const Dashboard = ({ theme, toggleTheme }) => {
                 </div>
 
                 {/* Maintenance Scheduler - RESTRICTED FOR VIEWERS & ADMIN (Admin focuses on management) */}
-                {(user?.role === 'technician') ? (
-                    <MaintenanceScheduler tasks={maintenanceTasks} onOptimize={optimizeTasks} />
-                ) : (
+                {user?.role === 'technician' && (
+                    <>
+                        {/* Machine visibility is scoped per technician, similar to IAM resource-based access. */}
+                        {/* Role resolution and resource visibility are enforced post-login, similar to IAM. */}
+                        <MyAssignedMachines />
+                        <MaintenanceScheduler tasks={maintenanceTasks} onOptimize={optimizeTasks} />
+                    </>
+                )}
+
+                {user?.role === 'admin' && (
+                    <AdminMachineManager />
+                )}
+
+                {user?.role !== 'technician' && user?.role !== 'admin' && (
                     <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', alignItems: 'center', textAlign: 'center', opacity: 0.7 }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '10px' }}>{isViewer ? '🔒' : '⚙️'}</div>
-                        <h3 style={{ color: 'var(--text-secondary)' }}>{isViewer ? 'RESTRICTED ACCESS' : 'MANAGEMENT MODE'}</h3>
+                        <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🔒</div>
+                        <h3 style={{ color: 'var(--text-secondary)' }}>RESTRICTED ACCESS</h3>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '5px' }}>
-                            {isViewer
-                                ? 'Detailed maintenance schedules are available to Technicians only.'
-                                : 'Admin focus is restricted to User Management and High-level Monitoring.'}
+                            Detailed maintenance schedules are available to Technicians only.
                         </p>
                     </div>
                 )}

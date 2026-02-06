@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, Lock, User, Eye, EyeOff, Sun, Moon } from 'lucide-react';
@@ -22,6 +22,13 @@ const Login = ({ theme, toggleTheme }) => {
             setError('Invalid credentials');
         }
     };
+
+    // Explicitly reset form fields on component mount (after logout)
+    useEffect(() => {
+        setUsername('');
+        setPassword('');
+        setError('');
+    }, []);
 
     return (
         <div style={{
@@ -88,7 +95,7 @@ const Login = ({ theme, toggleTheme }) => {
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* Username */}
                     <div style={{ position: 'relative' }}>
                         <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>
@@ -97,6 +104,7 @@ const Login = ({ theme, toggleTheme }) => {
                         <input
                             type="text" placeholder="Username"
                             value={username} onChange={(e) => setUsername(e.target.value)}
+                            autoComplete="off"
                             style={{
                                 width: '100%', padding: '12px 12px 12px 40px',
                                 background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)',
@@ -116,6 +124,7 @@ const Login = ({ theme, toggleTheme }) => {
                         <input
                             type={showPassword ? "text" : "password"} placeholder="Password"
                             value={password} onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="new-password"
                             style={{
                                 width: '100%', padding: '12px 40px 12px 40px',
                                 background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)',

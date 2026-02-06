@@ -1,7 +1,7 @@
 import React from 'react';
 import { Zap, Leaf, TrendingDown } from 'lucide-react';
 
-const PowerOptimizer = ({ efficiency, isEcoMode, onToggleEco, powerUsage }) => {
+const PowerOptimizer = ({ efficiency, isEcoMode, onToggleEco, powerUsage, readOnly }) => {
     return (
         <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
@@ -9,9 +9,9 @@ const PowerOptimizer = ({ efficiency, isEcoMode, onToggleEco, powerUsage }) => {
                     Energy Monitor
                 </h3>
                 <div
-                    onClick={onToggleEco}
+                    onClick={!readOnly ? onToggleEco : undefined}
                     style={{
-                        cursor: 'pointer',
+                        cursor: readOnly ? 'default' : 'pointer',
                         padding: '4px 10px',
                         borderRadius: '20px',
                         background: isEcoMode ? 'var(--success)' : 'rgba(255,255,255,0.1)',
@@ -19,6 +19,7 @@ const PowerOptimizer = ({ efficiency, isEcoMode, onToggleEco, powerUsage }) => {
                         fontSize: '0.75rem',
                         fontWeight: 'bold',
                         display: 'flex', alignItems: 'center', gap: '5px',
+                        opacity: readOnly ? 0.6 : 1,
                         transition: 'all 0.3s'
                     }}
                 >

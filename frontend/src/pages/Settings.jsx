@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Settings as SettingsIcon, Bell, Shield, Database, Cpu, Save, RefreshCw } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { MACHINE_ASSIGNMENTS } from '../services/mock/machineAssignments';
+import { MACHINES } from '../services/mock/machines';
+import { useAssignments } from '../context/AssignmentContext';
 
 const Settings = () => {
+    const { user } = useAuth();
+    const { assignments } = useAssignments();
+    const username = user?.username;
+
     const [config, setConfig] = useState({
         refreshInterval: 5000,
         alertThreshold: 85,
@@ -9,6 +17,10 @@ const Settings = () => {
         notificationEmail: 'tech-alerts@predictiox.com',
         autoDiagnostics: true
     });
+
+    // Get assigned machines for the logged-in technician from shared context
+    const assignedMachineNames = username ? (assignments[username] || []) : [];
+    const assignedMachines = MACHINES.filter(m => assignedMachineNames.includes(m.name));
 
     const [saving, setSaving] = useState(false);
 
@@ -119,6 +131,63 @@ const Settings = () => {
                         </div>
                     </div>
                 </div>
+
+
+                {/* Assigned Machines - Only visible to Technicians */}
+                {user?.role === 'technician' && (
+                    <div className="glass-panel" style={{ padding: '25px', gridColumn: '1 / -1' }}>
+                        <h3 className="text-neon" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                            <Database size={20} />
+                            Assigned Machines
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px' }}>
+                            {assignedMachines.length > 0 ? (
+                                assignedMachines.map((machine, idx) => (
+                                    <div key={idx} style={{
+                                        background: 'rgba(255,255,255,0.03)',
+                                        padding: '15px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--glass-border)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        animation: `fadeIn 0.3s ease-out ${idx * 0.1}s both`
+                                    }}>
+                                        <div style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '50%',
+                                            background: machine.status === 'Operational' ? 'var(--primary-neon)' : 'orange',
+                                            boxShadow: `0 0 10px ${machine.status === 'Operational' ? 'var(--primary-neon)' : 'orange'}`
+                                        }} />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                                                {machine.name}
+                                            </div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                                NODE ID: {machine.id} | EFFICIENCY: {machine.efficiency}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{
+                                    gridColumn: '1 / -1',
+                                    padding: '40px',
+                                    textAlign: 'center',
+                                    color: 'var(--text-secondary)',
+                                    background: 'rgba(255,255,255,0.02)',
+                                    borderRadius: '10px',
+                                    border: '1px dotted var(--glass-border)',
+                                    fontStyle: 'italic',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    No machines have been assigned to you yet.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Industrial Components */}
                 <div className="glass-panel" style={{ padding: '25px', gridColumn: '1 / -1' }}>
