@@ -165,12 +165,7 @@ const Login = ({ theme, toggleTheme }) => {
                     </button>
                 </form>
 
-                <div style={{ marginTop: '25px', textAlign: 'center', opacity: 0.7 }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', padding: '10px', background: 'rgba(0, 243, 255, 0.05)', borderRadius: '4px', border: '1px dashed var(--glass-border)' }}>
-                        <span style={{ fontWeight: 'bold', color: 'var(--primary-neon)' }}>Terminal Access Hint:</span><br />
-                        Default Admin: <span style={{ color: 'var(--text-primary)' }}>admin / admin123</span>
-                    </div>
-                </div>
+                
 
                 <div style={{ marginTop: '15px', textAlign: 'center' }}>
                     <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>New System Node? </span>
