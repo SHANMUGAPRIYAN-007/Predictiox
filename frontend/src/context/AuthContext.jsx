@@ -57,9 +57,8 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: 'User already exists' };
         }
 
-        // Use roleResolver to determine the role
-        // This overrides the 'role' argument passed from the UI
-        const resolvedRole = resolveUserRole(username);
+        // Use roleResolver to determine the role, passing the UI selection as a preference
+        const resolvedRole = resolveUserRole(username, role);
 
         // Lowercase the role for consistency with existing app logic (which uses 'admin', 'technician')
         // roleResolver returns uppercase 'ADMIN' etc.

@@ -13,13 +13,13 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="sidebar" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <aside className="sidebar">
             <div className="logo text-neon">
                 <Zap size={24} />
                 <span>PREDICTIO<span style={{ color: 'var(--theme-accent)' }}>X</span></span>
             </div>
 
-            <nav className="nav-menu" style={{ flex: 1 }}>
+            <nav className="nav-menu">
                 <NavLink
                     to="/"
                     className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -64,35 +64,24 @@ const Sidebar = () => {
             </nav>
 
             {/* User Profile & Logout Section */}
-            <div style={{
-                borderTop: '1px solid var(--glass-border)',
-                paddingTop: '20px',
-                marginTop: 'auto'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '15px', padding: '0 10px' }}>
-                    <div style={{
-                        width: '36px', height: '36px',
-                        borderRadius: '50%',
-                        background: 'var(--glass-bg)',
-                        border: '1px solid var(--primary-neon)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
+            <div className="sidebar-footer">
+                <div className="user-profile-summary">
+                    <div className="user-avatar">
                         <User size={18} color="var(--primary-neon)" />
                     </div>
-                    <div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                    <div className="user-info">
+                        <div className="user-name">
                             {user?.name || 'User'}
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                        <div className="user-role">
                             {user?.role || 'Viewer'}
                         </div>
                     </div>
                 </div>
 
                 <div
-                    className="nav-item"
+                    className="nav-item logout-item"
                     onClick={handleLogout}
-                    style={{ color: 'var(--alert-critical)', marginTop: '0' }}
                 >
                     <LogOut size={20} />
                     <span>Logout</span>

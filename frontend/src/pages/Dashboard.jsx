@@ -140,7 +140,7 @@ const Dashboard = ({ theme, toggleTheme }) => {
                 <DigitalTwinCanvas />
 
                 {/* RUL + Power Optimizer Row */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="dashboard-row">
                     <RULGauge percentage={rul} />
                     <PowerOptimizer
                         efficiency={powerEff}
@@ -152,7 +152,7 @@ const Dashboard = ({ theme, toggleTheme }) => {
                 </div>
 
                 {/* Charts Row */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="dashboard-row">
                     <LiveChart
                         title="Temperature Trend"
                         data={history.temperature}

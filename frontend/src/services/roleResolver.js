@@ -1,10 +1,7 @@
 import { USERS } from './mock/users';
 
-export const resolveUserRole = (username) => {
-    // 1. If no users exist in the system (mock USERS is the source of truth for "pre-approved" users here 
-    //    or "system initialization" check, but keeping strictly to requested logic:
-    //    "If no users exist yet, return 'ADMIN'". 
-    //    We check USERS length.
+export const resolveUserRole = (username, requestedRole = 'VIEWER') => {
+    // 1. If no users exist yet, return 'ADMIN' for the first initialization
     if (!USERS || USERS.length === 0) {
         return 'ADMIN';
     }
@@ -22,12 +19,13 @@ export const resolveUserRole = (username) => {
         return user.role; // Returns ADMIN, TECHNICIAN, etc.
     }
 
-    // Default fallback if user not found (e.g. self-registration of a Viewer)
-    // The prompt implies "Store username in USERS if not exists", but we can't write to this file.
-    // We will assume 'VIEWER' as safe default for unknown users if the flow continues, 
-    // OR return null to let the caller decide (but prompt says "Assign role using resolveUserRole").
-    // We'll return 'VIEWER' to be safe, or 'TECHNICIAN' if we want to be generous? 
-    // "Ignore role selection from UI" -> implies we decide. 
-    // Let's default to VIEWER.
-    return 'VIEWER';
+    // 3. For new users (Self-Registration), respect the requested role from the UI
+    //    Lowercase the input to handle 'admin' vs 'ADMIN' etc.
+    const roleMap = {
+        'admin': 'ADMIN',
+        'technician': 'TECHNICIAN',
+        'viewer': 'VIEWER'
+    };
+
+    return roleMap[requestedRole.toLowerCase()] || 'VIEWER';
 };

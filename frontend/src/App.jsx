@@ -64,7 +64,7 @@ const App = () => {
       )}
 
       {/* Main Content Area - Full width if standalone, else has sidebar margin handled by grid/flex */}
-      <main className={!isStandalone ? "main-content" : ""} style={isStandalone ? { width: '100vw', height: '100vh' } : {}}>
+      <main className={!isStandalone ? "main-content" : "standalone-content"}>
         <Routes>
           <Route path="/login" element={<Login theme={theme} toggleTheme={toggleTheme} />} />
           <Route path="/register" element={<Register theme={theme} toggleTheme={toggleTheme} />} />
